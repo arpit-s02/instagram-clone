@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const likeSchema = new mongoose.Schema(
+const notificationSchema = new mongoose.Schema(
     {
         user: {
             type: mongoose.Schema.Types.ObjectId,
@@ -9,13 +9,17 @@ const likeSchema = new mongoose.Schema(
         },
         target: {
             type: mongoose.Schema.Types.ObjectId,
-            refPath: 'targetModel', // ref would be equal to value of targetModel
+            refPath: 'targetModel',
             required: true
         },
         targetModel: {
             type: String,
-            enum: ['Post', 'Comment'],
+            enum: ['Like', 'Comment', 'Follow'],
             required: true
+        },
+        read: {
+            type: Boolean,
+            default: false
         }
     },
     {
@@ -23,6 +27,6 @@ const likeSchema = new mongoose.Schema(
     }
 );
 
-const Like = mongoose.model('Like', likeSchema);
+const Notification = mongoose.model('Notification', notificationSchema);
 
-export default Like;
+export default Notification;
