@@ -1,9 +1,8 @@
 import express from "express";
+import userRoutes from "./user.routes.js";
 
 const router = express.Router();
 
-router.get("/", (req, res) => {
-    return res.send("Instagram app");
-})
+router.use("/user", userRoutes);
 
 export default router;
