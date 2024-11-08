@@ -1,5 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import ApiError from "../utils/ApiError.js";
+import { StatusCodes } from "http-status-codes";
 
 const hashPassword = async (password) => {
     const saltRounds = 10;
@@ -18,8 +20,13 @@ const generateToken = (payload, secret) => {
 }
 
 const verifyToken = (token, secret) => {
-    const decoded = jwt.verify(token, secret);
-    return decoded;
+    try {
+        const decoded = jwt.verify(token, secret);
+        return decoded;
+
+    } catch (error) {
+        throw new ApiError("Invalid token", StatusCodes.UNAUTHORIZED);
+    }
 }
 
 export { hashPassword, generateToken, verifyToken, verifyPassword };
