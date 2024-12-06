@@ -10,9 +10,18 @@ const getPostById = async (postId) => {
     return post;
 };
 
+const getUserUploads = async (userId) => {
+    const uploads = await Post.find(
+        { user: userId },
+        { user: false, createdAt: false, updatedAt: false, __v: false }
+    );
+
+    return uploads;
+};
+
 const createPost = async (post) => {
     const newPost = await Post.create(post);
     return newPost;
 };
 
-export { createPost, getPostById };
+export { createPost, getPostById, getUserUploads };

@@ -3,6 +3,7 @@ import {
     createNewPost,
     getPost,
     getPostLikes,
+    getUploads,
 } from "../controllers/post.controllers.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import authenticate from "../middlewares/authenticate.middleware.js";
@@ -13,6 +14,7 @@ const router = express.Router();
 
 router.use(authenticate);
 
+router.get("/uploads", getUploads);
 router.post("/create", upload.array("media"), createNewPost);
 router.get("/:id", validate(mongoIdSchema, "params"), getPost);
 router.get("/:id/likes", validate(mongoIdSchema, "params"), getPostLikes);

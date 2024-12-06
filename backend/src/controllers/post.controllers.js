@@ -1,8 +1,13 @@
 import ApiError from "../utils/ApiError.js";
 import { uploadToCloudinary } from "../utils/cloudinary.js";
 import { StatusCodes } from "http-status-codes";
-import { createPost, getPostById } from "../services/post.services.js";
+import {
+    createPost,
+    getPostById,
+    getUserUploads,
+} from "../services/post.services.js";
 import { getLikesById } from "../services/like.services.js";
+import { getUserById } from "../services/user.services.js";
 
 const getPost = async (req, res, next) => {
     try {
@@ -59,6 +64,23 @@ const createNewPost = async (req, res, next) => {
     }
 };
 
+const getUploads = async (req, res, next) => {
+    try {
+        // extract user id from req
+        const userId = req.user._id;
+
+        // get user uploads
+        const uploads = await getUserUploads(userId);
+
+        // return user uploads as response
+        return res.json(uploads);
+    } catch (error) {
+        // handle error
+        console.error(error);
+        next(error);
+    }
+};
+
 const getPostLikes = async (req, res, next) => {
     try {
         // default values for page and limit
@@ -89,4 +111,4 @@ const getPostLikes = async (req, res, next) => {
     }
 };
 
-export { createNewPost, getPostLikes, getPost };
+export { createNewPost, getPostLikes, getPost, getUploads };
