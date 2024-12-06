@@ -13,7 +13,7 @@ const getPostById = async (postId) => {
 const getUserUploads = async (userId) => {
     const uploads = await Post.find(
         { user: userId },
-        { user: false, createdAt: false, updatedAt: false, __v: false }
+        { user: false, __v: false }
     );
 
     return uploads;
