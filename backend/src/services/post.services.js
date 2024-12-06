@@ -2,8 +2,6 @@ import Post from "../models/post.model.js";
 
 const getPostById = async (postId) => {
     const post = await Post.findById(postId, {
-        createdAt: false,
-        updatedAt: false,
         __v: false,
     });
 
