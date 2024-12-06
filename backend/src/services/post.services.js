@@ -1,8 +1,13 @@
 import Post from "../models/post.model.js";
 
+const getPostById = async (postId) => {
+    const post = await Post.findById(postId);
+    return post;
+};
+
 const createPost = async (post) => {
     const newPost = await Post.create(post);
     return newPost;
-}
+};
 
-export { createPost };
+export { createPost, getPostById };
