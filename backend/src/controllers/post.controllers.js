@@ -4,6 +4,25 @@ import { StatusCodes } from "http-status-codes";
 import { createPost, getPostById } from "../services/post.services.js";
 import { getLikesById } from "../services/like.services.js";
 
+const getPost = async (req, res, next) => {
+    try {
+        // extract post id from req
+        const { id: postId } = req.params;
+
+        // get post by using post id
+        const post = await getPostById(postId);
+
+        // if post not found throw error
+        if (!post) throw new ApiError("Post not found", StatusCodes.NOT_FOUND);
+
+        // return post as response
+        return res.json(post);
+    } catch (error) {
+        // pass error to error handling middleware
+        next(error);
+    }
+};
+
 const createNewPost = async (req, res, next) => {
     try {
         // extract media, caption and user id from req
@@ -47,12 +66,12 @@ const getPostLikes = async (req, res, next) => {
         const defaultLimit = 20;
 
         // extract postId, page and limit from req
-        const { id: postId } = req.body;
+        const { id: postId } = req.params;
         const page = parseInt(req.query.page || defaultPage);
         const limit = parseInt(req.query.limit || defaultLimit);
 
         // find post by postId
-        const post = getPostById(postId);
+        const post = await getPostById(postId);
 
         // if post is not found, throw error
         if (!post) {
@@ -70,4 +89,4 @@ const getPostLikes = async (req, res, next) => {
     }
 };
 
-export { createNewPost, getPostLikes };
+export { createNewPost, getPostLikes, getPost };
