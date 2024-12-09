@@ -3,11 +3,41 @@ import { uploadToCloudinary } from "../utils/cloudinary.js";
 import { StatusCodes } from "http-status-codes";
 import {
     createPost,
+    findPosts,
     getPostById,
     getUserUploads,
 } from "../services/post.services.js";
 import { getLikesById } from "../services/like.services.js";
-import { getUserById } from "../services/user.services.js";
+import { findUserFollowing } from "../services/follow.services.js";
+
+const getFeed = async (req, res, next) => {
+    try {
+        // default values for current page and limit
+        const defaultPage = 1;
+        const defaultLimit = 10;
+
+        // extract user id, page, limit from req
+        const userId = req.user._id;
+        const page = parseInt(req.query.page) || defaultPage;
+        const limit = parseInt(req.query.limit) || defaultLimit;
+
+        // find users that the logged in user follows (following)
+        const userFollowing = await findUserFollowing(userId);
+
+        // create an array of ids of users (following)
+        const userIds = userFollowing.map((relation) => relation.following);
+
+        // find posts of the users (following) using current page and limit
+        const posts = await findPosts(userIds, page, limit);
+
+        // return posts as response
+        return res.json(posts);
+    } catch (error) {
+        // handle error
+        console.error(error);
+        next(error);
+    }
+};
 
 const getPost = async (req, res, next) => {
     try {
@@ -89,8 +119,8 @@ const getPostLikes = async (req, res, next) => {
 
         // extract postId, page and limit from req
         const { id: postId } = req.params;
-        const page = parseInt(req.query.page || defaultPage);
-        const limit = parseInt(req.query.limit || defaultLimit);
+        const page = parseInt(req.query.page) || defaultPage;
+        const limit = parseInt(req.query.limit) || defaultLimit;
 
         // find post by postId
         const post = await getPostById(postId);
@@ -111,4 +141,4 @@ const getPostLikes = async (req, res, next) => {
     }
 };
 
-export { createNewPost, getPostLikes, getPost, getUploads };
+export { createNewPost, getPostLikes, getPost, getUploads, getFeed };
