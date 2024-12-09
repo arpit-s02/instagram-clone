@@ -13,4 +13,17 @@ const findUserFollowing = async (userId) => {
     return userFollowing;
 };
 
-export { findUserFollowing };
+const findFollowRequest = async (followerId, followingId) => {
+    const followRequest = await Follow.findOne({
+        follower: followerId,
+        following: followingId,
+    });
+
+    return followRequest;
+};
+
+const createFollowRequest = async (followerId, followingId) => {
+    await Follow.create({ follower: followerId, following: followingId });
+};
+
+export { findUserFollowing, createFollowRequest, findFollowRequest };

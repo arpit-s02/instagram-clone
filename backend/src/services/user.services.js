@@ -5,19 +5,19 @@ const createUser = async (user) => {
     return newUser;
 };
 
-const getUserById = async (id) => {
+const findUserById = async (id) => {
     const user = await User.findById(id);
     return user;
 };
 
-const getUserByEmail = async (email) => {
+const findUserByEmail = async (email) => {
     const user = await User.findOne({ email });
     return user;
 };
 
-const getUserByUsername = async (username) => {
+const findUserByUsername = async (username) => {
     const user = await User.findOne({ username });
     return user;
 };
 
-export { createUser, getUserByEmail, getUserById, getUserByUsername };
+export { createUser, findUserByEmail, findUserById, findUserByUsername };

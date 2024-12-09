@@ -5,8 +5,8 @@ import {
 } from "../services/authentication.services.js";
 import {
     createUser,
-    getUserByEmail,
-    getUserByUsername,
+    findUserByEmail,
+    findUserByUsername,
 } from "../services/user.services.js";
 import { StatusCodes } from "http-status-codes";
 import ApiError from "../utils/ApiError.js";
@@ -23,7 +23,7 @@ const signup = async (req, res, next) => {
             );
         }
 
-        const existingUser = await getUserByEmail(email);
+        const existingUser = await findUserByEmail(email);
 
         if (existingUser) {
             throw new ApiError(
@@ -32,7 +32,7 @@ const signup = async (req, res, next) => {
             );
         }
 
-        const isUsernameTaken = await getUserByUsername(username);
+        const isUsernameTaken = await findUserByUsername(username);
 
         if (isUsernameTaken) {
             throw new ApiError(
@@ -63,7 +63,7 @@ const signin = async (req, res, next) => {
     try {
         const { email, password } = req.body;
 
-        const user = await getUserByEmail(email);
+        const user = await findUserByEmail(email);
 
         if (!user) {
             throw new ApiError(
