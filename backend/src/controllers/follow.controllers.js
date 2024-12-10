@@ -9,6 +9,41 @@ import {
     updateFollowRequest,
 } from "../services/follow.services.js";
 
+const getFollowRequest = async (req, res, next) => {
+    try {
+        // extract logged in user id and id of the user to be followed
+        const followerId = req.user._id; // logged in user id
+        const { id: followingId } = req.params; // id of the user to be followed
+
+        // check if user to be followed exists
+        const userToFollow = await findUserById(followingId);
+
+        // if user to be followed does not exist, throw error
+        if (!userToFollow) {
+            throw new ApiError("User not found", StatusCodes.NOT_FOUND);
+        }
+
+        // find follow request
+        const followRequest = await findFollowRequest(followerId, followingId);
+
+        // if follow request does not exist, throw error
+        if (!followRequest) {
+            throw new ApiError(
+                "Follow request does not exist",
+                StatusCodes.NOT_FOUND
+            );
+        }
+
+        // return follow request as response
+        const { createdAt, updatedAt, __v, ...response } = followRequest._doc;
+        return res.json(response);
+    } catch (error) {
+        // handle error
+        console.error(error);
+        next(error);
+    }
+};
+
 const sendFollowRequest = async (req, res, next) => {
     try {
         // extract user id of logged in user and the user to be followed from req
@@ -174,4 +209,10 @@ const deleteFollower = async (req, res, next) => {
     }
 };
 
-export { sendFollowRequest, updateRequestStatus, unfollowUser, deleteFollower };
+export {
+    sendFollowRequest,
+    updateRequestStatus,
+    unfollowUser,
+    deleteFollower,
+    getFollowRequest,
+};
