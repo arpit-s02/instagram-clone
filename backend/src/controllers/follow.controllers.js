@@ -134,4 +134,44 @@ const unfollowUser = async (req, res, next) => {
     }
 };
 
-export { sendFollowRequest, updateRequestStatus, unfollowUser };
+const deleteFollower = async (req, res, next) => {
+    try {
+        // extract logged in user id and follower id from req
+        const followingId = req.user._id; // logged in user id
+        const { id: followerId } = req.params; // follower id
+
+        // check if user with follower id exists
+        const follower = await findUserById(followerId);
+
+        // if user with follower id does not exist, throw error
+        if (!follower) {
+            throw new ApiError(
+                "User with the follower id does not exist",
+                StatusCodes.NOT_FOUND
+            );
+        }
+
+        // check if relationship exists between users
+        const followRequest = await findFollowRequest(followerId, followingId);
+
+        // if relationship does not exist, throw error
+        if (!followRequest) {
+            throw new ApiError(
+                "Follow request does not exist",
+                StatusCodes.NOT_FOUND
+            );
+        }
+
+        // delete follow request
+        await removeFollowRequest(followRequest._id);
+
+        // return successful response
+        return res.json({ message: "Follower removed successfully" });
+    } catch (error) {
+        // handle error
+        console.error(error);
+        next(error);
+    }
+};
+
+export { sendFollowRequest, updateRequestStatus, unfollowUser, deleteFollower };

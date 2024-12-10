@@ -4,6 +4,7 @@ import validate from "../middlewares/validate.middleware.js";
 import mongoIdSchema from "../schemas/mongoId.schema.js";
 import followRequestStatusSchema from "../schemas/followRequestStatus.schema.js";
 import {
+    deleteFollower,
     sendFollowRequest,
     unfollowUser,
     updateRequestStatus,
@@ -24,6 +25,11 @@ router.delete(
     "/followings/:id",
     validate(mongoIdSchema, "params"),
     unfollowUser
+);
+router.delete(
+    "/followers/:id",
+    validate(mongoIdSchema, "params"),
+    deleteFollower
 );
 
 export default router;
