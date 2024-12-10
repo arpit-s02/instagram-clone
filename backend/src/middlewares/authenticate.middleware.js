@@ -17,7 +17,7 @@ const authenticate = async (req, res, next) => {
         const user = await findUserById(id);
 
         if (!user) {
-            throw new ApiError("user not found", StatusCodes.NOT_FOUND);
+            throw new ApiError("Invalid user", StatusCodes.UNAUTHORIZED);
         }
 
         req.user = user;
