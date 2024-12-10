@@ -5,6 +5,7 @@ import mongoIdSchema from "../schemas/mongoId.schema.js";
 import followRequestStatusSchema from "../schemas/followRequestStatus.schema.js";
 import {
     sendFollowRequest,
+    unfollowUser,
     updateRequestStatus,
 } from "../controllers/follow.controllers.js";
 
@@ -18,6 +19,11 @@ router.patch(
     validate(mongoIdSchema, "params"),
     validate(followRequestStatusSchema, "body"),
     updateRequestStatus
+);
+router.delete(
+    "/followings/:id",
+    validate(mongoIdSchema, "params"),
+    unfollowUser
 );
 
 export default router;

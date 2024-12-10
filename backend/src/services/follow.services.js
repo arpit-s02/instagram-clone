@@ -44,10 +44,15 @@ const updateFollowRequest = async (followRequestId, updates) => {
     return updatedFollowRequest;
 };
 
+const removeFollowRequest = async (followRequestId) => {
+    await Follow.findByIdAndDelete(followRequestId);
+};
+
 export {
     findUserFollowing,
     createFollowRequest,
     findFollowRequest,
     findFollowRequestById,
     updateFollowRequest,
+    removeFollowRequest,
 };

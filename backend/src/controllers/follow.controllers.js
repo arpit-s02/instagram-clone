@@ -5,6 +5,7 @@ import {
     createFollowRequest,
     findFollowRequest,
     findFollowRequestById,
+    removeFollowRequest,
     updateFollowRequest,
 } from "../services/follow.services.js";
 
@@ -93,4 +94,44 @@ const updateRequestStatus = async (req, res, next) => {
     }
 };
 
-export { sendFollowRequest, updateRequestStatus };
+const unfollowUser = async (req, res, next) => {
+    try {
+        // extract logged in user id and followed user id from req
+        const followerId = req.user._id; // logged in user id
+        const { id: followingId } = req.params; // followed user id
+
+        // check if user with following id exists
+        const followedUser = await findUserById(followingId);
+
+        // if user with following id does not exist, throw error
+        if (!followedUser) {
+            throw new ApiError(
+                "User requested to be unfollowed does not exist",
+                StatusCodes.NOT_FOUND
+            );
+        }
+
+        // check if relationship exists between users
+        const followRequest = await findFollowRequest(followerId, followingId);
+
+        // if relationship does not exist, throw error
+        if (!followRequest) {
+            throw new ApiError(
+                "Follow request does not exist",
+                StatusCodes.NOT_FOUND
+            );
+        }
+
+        // delete follow request
+        await removeFollowRequest(followRequest._id);
+
+        // return successful response
+        return res.json({ message: "Unfollowed the user successfully" });
+    } catch (error) {
+        // handle error
+        console.error(error);
+        next(error);
+    }
+};
+
+export { sendFollowRequest, updateRequestStatus, unfollowUser };
