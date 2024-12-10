@@ -22,8 +22,32 @@ const findFollowRequest = async (followerId, followingId) => {
     return followRequest;
 };
 
+const findFollowRequestById = async (followRequestId) => {
+    const followRequest = await Follow.findById(followRequestId);
+    return followRequest;
+};
+
 const createFollowRequest = async (followerId, followingId) => {
     await Follow.create({ follower: followerId, following: followingId });
 };
 
-export { findUserFollowing, createFollowRequest, findFollowRequest };
+const updateFollowRequest = async (followRequestId, updates) => {
+    const updatedFollowRequest = await Follow.findByIdAndUpdate(
+        followRequestId,
+        updates,
+        {
+            overwrite: false,
+            new: true,
+        }
+    );
+
+    return updatedFollowRequest;
+};
+
+export {
+    findUserFollowing,
+    createFollowRequest,
+    findFollowRequest,
+    findFollowRequestById,
+    updateFollowRequest,
+};

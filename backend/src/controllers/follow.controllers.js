@@ -4,6 +4,8 @@ import ApiError from "../utils/ApiError.js";
 import {
     createFollowRequest,
     findFollowRequest,
+    findFollowRequestById,
+    updateFollowRequest,
 } from "../services/follow.services.js";
 
 const sendFollowRequest = async (req, res, next) => {
@@ -56,4 +58,39 @@ const sendFollowRequest = async (req, res, next) => {
     }
 };
 
-export { sendFollowRequest };
+const updateRequestStatus = async (req, res, next) => {
+    try {
+        // extract follow request id and new status from req
+        const { id: followRequestId } = req.params;
+        const { status } = req.body;
+
+        // check if follow request exists
+        const followRequest = await findFollowRequestById(followRequestId);
+
+        // if follow request does not exist, throw error
+        if (!followRequest) {
+            throw new ApiError(
+                "Follow request not found",
+                StatusCodes.NOT_FOUND
+            );
+        }
+
+        // update follow request status
+        const updatedFollowRequest = await updateFollowRequest(
+            followRequestId,
+            { status }
+        );
+
+        const { createdAt, updatedAt, __v, ...response } =
+            updatedFollowRequest._doc;
+
+        // return updated follow request as response
+        return res.json(response);
+    } catch (error) {
+        // handle error
+        console.error(error);
+        next(error);
+    }
+};
+
+export { sendFollowRequest, updateRequestStatus };
