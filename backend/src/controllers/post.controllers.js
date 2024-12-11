@@ -9,6 +9,7 @@ import {
     removePost,
 } from "../services/post.services.js";
 import {
+    deleteLike,
     findLikeByUserId,
     getLikesById,
     insertLike,
@@ -217,12 +218,47 @@ const createPostLike = async (req, res, next) => {
     }
 };
 
+const deletePostLike = async (req, res, next) => {
+    try {
+        // extract logged in user id and post id from req
+        const userId = req.user._id;
+        const postId = req.params.id;
+
+        // find post using post id
+        const post = await getPostById(postId);
+
+        // if post does not exist, throw error
+        if (!post) {
+            throw new ApiError("Post not found", StatusCodes.NOT_FOUND);
+        }
+
+        // find like to be deleted
+        const like = await findLikeByUserId(userId, postId);
+
+        // if like does not exist, return successful response
+        if (!like) {
+            return res.status(StatusCodes.NO_CONTENT).send();
+        }
+
+        // delete like
+        await deleteLike(like._id);
+
+        // return successful response
+        return res.status(StatusCodes.NO_CONTENT).send();
+    } catch (error) {
+        // handle error
+        console.error(error);
+        next(error);
+    }
+};
+
 export {
     createNewPost,
-    getPostLikes,
-    createPostLike,
     getPost,
+    deletePost,
     getUploads,
     getFeed,
-    deletePost,
+    getPostLikes,
+    createPostLike,
+    deletePostLike,
 };

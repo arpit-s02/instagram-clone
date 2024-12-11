@@ -7,6 +7,7 @@ import {
     createNewPost,
     createPostLike,
     deletePost,
+    deletePostLike,
     getPost,
     getPostLikes,
 } from "../controllers/post.controllers.js";
@@ -21,5 +22,6 @@ router.delete("/:id", validate(mongoIdSchema, "params"), deletePost);
 
 router.get("/:id/likes", validate(mongoIdSchema, "params"), getPostLikes);
 router.post("/:id/likes", validate(mongoIdSchema, "params"), createPostLike);
+router.delete("/:id/likes", validate(mongoIdSchema, "params"), deletePostLike);
 
 export default router;
