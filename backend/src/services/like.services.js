@@ -1,11 +1,13 @@
+import mongoose from "mongoose";
 import Like from "../models/likes.model.js";
 
 const getLikesById = async (targetId, page, limit) => {
     const skipCount = (page - 1) * limit;
+    const ObjectId = mongoose.Types.ObjectId;
 
     const aggregation = [
         // Step 1: Match the likes for the targetId
-        { $match: { target: targetId } },
+        { $match: { target: new ObjectId(targetId) } },
 
         // Step 2: Project only necessary fields (e.g., user) and add pagination
         { $project: { user: 1 } },
