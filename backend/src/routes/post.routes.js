@@ -5,6 +5,7 @@ import mongoIdSchema from "../schemas/mongoId.schema.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import {
     createNewPost,
+    createPostLike,
     deletePost,
     getPost,
     getPostLikes,
@@ -14,12 +15,11 @@ const router = express.Router();
 
 router.use(authenticate);
 
+router.post("/", upload.array("media"), createNewPost);
 router.get("/:id", validate(mongoIdSchema, "params"), getPost);
+router.delete("/:id", validate(mongoIdSchema, "params"), deletePost);
 
 router.get("/:id/likes", validate(mongoIdSchema, "params"), getPostLikes);
-
-router.post("/", upload.array("media"), createNewPost);
-
-router.delete("/:id", validate(mongoIdSchema, "params"), deletePost);
+router.post("/:id/likes", validate(mongoIdSchema, "params"), createPostLike);
 
 export default router;

@@ -8,7 +8,11 @@ import {
     getUserUploads,
     removePost,
 } from "../services/post.services.js";
-import { getLikesById } from "../services/like.services.js";
+import {
+    findLikeByUserId,
+    getLikesById,
+    insertLike,
+} from "../services/like.services.js";
 import { findUserFollowing } from "../services/follow.services.js";
 
 const getPost = async (req, res, next) => {
@@ -176,9 +180,47 @@ const getPostLikes = async (req, res, next) => {
     }
 };
 
+const createPostLike = async (req, res, next) => {
+    try {
+        // extract logged in user id and post id from req
+        const userId = req.user._id;
+        const postId = req.params.id;
+
+        // find post using post id
+        const post = await getPostById(postId);
+
+        // if post does not exist, throw error
+        if (!post) {
+            throw new ApiError("Post not found", StatusCodes.NOT_FOUND);
+        }
+
+        // find like for the post by logged in user
+        const like = await findLikeByUserId(userId, postId);
+
+        // if like already exists, return successful response
+        if (like) {
+            const { createdAt, updatedAt, __v, ...response } = like._doc;
+            return res.status(StatusCodes.OK).json(response);
+        }
+
+        // create a like
+        const targetModel = "Post";
+        const newLike = await insertLike(userId, postId, targetModel);
+
+        // return successful response
+        const { createdAt, updatedAt, __v, ...response } = newLike._doc;
+        return res.status(StatusCodes.CREATED).json(response);
+    } catch (error) {
+        // handle error
+        console.error(error);
+        next(error);
+    }
+};
+
 export {
     createNewPost,
     getPostLikes,
+    createPostLike,
     getPost,
     getUploads,
     getFeed,

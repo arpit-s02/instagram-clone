@@ -40,12 +40,23 @@ const getLikesById = async (targetId, page, limit) => {
     };
 };
 
-const createLike = async (userId, targetId, targetModel) => {
-    await Like.create({ user: userId, target: targetId, targetModel });
+const findLikeByUserId = async (userId, targetId) => {
+    const like = await Like.findOne({ user: userId, target: targetId });
+    return like;
+};
+
+const insertLike = async (userId, targetId, targetModel) => {
+    const like = await Like.create({
+        user: userId,
+        target: targetId,
+        targetModel,
+    });
+
+    return like;
 };
 
 const deleteLike = async (id) => {
     await Like.findByIdAndDelete(id);
 };
 
-export { getLikesById, createLike, deleteLike };
+export { getLikesById, findLikeByUserId, insertLike, deleteLike };
