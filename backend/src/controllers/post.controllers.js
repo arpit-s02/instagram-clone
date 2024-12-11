@@ -6,38 +6,10 @@ import {
     findPosts,
     getPostById,
     getUserUploads,
+    removePost,
 } from "../services/post.services.js";
 import { getLikesById } from "../services/like.services.js";
 import { findUserFollowing } from "../services/follow.services.js";
-
-const getFeed = async (req, res, next) => {
-    try {
-        // default values for current page and limit
-        const defaultPage = 1;
-        const defaultLimit = 10;
-
-        // extract user id, page, limit from req
-        const userId = req.user._id;
-        const page = parseInt(req.query.page) || defaultPage;
-        const limit = parseInt(req.query.limit) || defaultLimit;
-
-        // find users that the logged in user follows (following)
-        const userFollowing = await findUserFollowing(userId);
-
-        // create an array of ids of users (following)
-        const userIds = userFollowing.map((relation) => relation.following);
-
-        // find posts of the users (following) using current page and limit
-        const posts = await findPosts(userIds, page, limit);
-
-        // return posts as response
-        return res.json(posts);
-    } catch (error) {
-        // handle error
-        console.error(error);
-        next(error);
-    }
-};
 
 const getPost = async (req, res, next) => {
     try {
@@ -94,6 +66,69 @@ const createNewPost = async (req, res, next) => {
     }
 };
 
+const deletePost = async (req, res, next) => {
+    try {
+        // extract logged in user id and post id from req
+        const userId = req.user._id;
+        const { id: postId } = req.params;
+
+        // find post using post id
+        const post = await getPostById(postId);
+
+        // if post does not exist, throw error
+        if (!post) {
+            throw new ApiError("Post not found", StatusCodes.NOT_FOUND);
+        }
+
+        // check if post belongs to the logged in user, if not throw error
+        if (post.user.toString() !== userId.toString()) {
+            throw new ApiError(
+                "A user cannot delete a post of another user",
+                StatusCodes.FORBIDDEN
+            );
+        }
+
+        // delete post
+        await removePost(postId);
+
+        // return successful response
+        return res.status(StatusCodes.NO_CONTENT).send();
+    } catch (error) {
+        // handle error
+        console.error(error);
+        next(error);
+    }
+};
+
+const getFeed = async (req, res, next) => {
+    try {
+        // default values for current page and limit
+        const defaultPage = 1;
+        const defaultLimit = 10;
+
+        // extract user id, page, limit from req
+        const userId = req.user._id;
+        const page = parseInt(req.query.page) || defaultPage;
+        const limit = parseInt(req.query.limit) || defaultLimit;
+
+        // find users that the logged in user follows (following)
+        const userFollowing = await findUserFollowing(userId);
+
+        // create an array of ids of users (following)
+        const userIds = userFollowing.map((relation) => relation.following);
+
+        // find posts of the users (following) using current page and limit
+        const posts = await findPosts(userIds, page, limit);
+
+        // return posts as response
+        return res.json(posts);
+    } catch (error) {
+        // handle error
+        console.error(error);
+        next(error);
+    }
+};
+
 const getUploads = async (req, res, next) => {
     try {
         // extract user id from req
@@ -141,4 +176,11 @@ const getPostLikes = async (req, res, next) => {
     }
 };
 
-export { createNewPost, getPostLikes, getPost, getUploads, getFeed };
+export {
+    createNewPost,
+    getPostLikes,
+    getPost,
+    getUploads,
+    getFeed,
+    deletePost,
+};

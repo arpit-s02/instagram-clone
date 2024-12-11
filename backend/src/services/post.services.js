@@ -1,10 +1,7 @@
 import Post from "../models/post.model.js";
 
 const getPostById = async (postId) => {
-    const post = await Post.findById(postId, {
-        __v: false,
-    });
-
+    const post = await Post.findById(postId);
     return post;
 };
 
@@ -61,4 +58,8 @@ const createPost = async (post) => {
     return newPost;
 };
 
-export { createPost, getPostById, getUserUploads, findPosts };
+const removePost = async (postId) => {
+    await Post.findByIdAndDelete(postId);
+};
+
+export { createPost, getPostById, getUserUploads, findPosts, removePost };
