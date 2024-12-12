@@ -48,7 +48,7 @@ const sendFollowRequest = async (req, res, next) => {
   try {
     // extract user id of logged in user and the user to be followed from req
     const followerId = req.user._id; // logged in user
-    const { id: followingId } = req.body; // user to be followed
+    const { id: followingId } = req.params; // user to be followed
 
     // if followerId and followingId are same, throw error
     if (followerId.toString() === followingId) {
