@@ -79,7 +79,7 @@ const deleteComment = async (req, res, next) => {
     }
 
     // delete comment
-    await removeComment(commentId);
+    await removeComment(comment);
 
     // return successful response
     return res.status(StatusCodes.NO_CONTENT).send();
