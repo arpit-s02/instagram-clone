@@ -3,6 +3,7 @@ import { getPostById } from "../services/post.services.js";
 import ApiError from "../utils/ApiError.js";
 import {
   findCommentById,
+  findCommentOnPost,
   insertComment,
   removeComment,
 } from "../services/comment.services.js";
@@ -22,8 +23,8 @@ const createComment = async (req, res, next) => {
     }
 
     if (parentId) {
-      // if parent id is present, find parent comment using parent id
-      const parentComment = await findCommentById(parentId);
+      // if parent id is present, find parent comment on the post
+      const parentComment = await findCommentOnPost(parentId, postId);
 
       // if parent comment does not exist, throw error
       if (!parentComment) {
@@ -32,12 +33,15 @@ const createComment = async (req, res, next) => {
     }
 
     // create comment
-    const newComment = await insertComment({
-      post: postId,
-      user: userId,
-      content,
-      parentId,
-    });
+    const newComment = await insertComment(
+      {
+        post: postId,
+        user: userId,
+        content,
+        parentId,
+      },
+      parentId
+    );
 
     // return comment as response
     const { createdAt, updatedAt, __v, ...response } = newComment._doc;

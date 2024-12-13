@@ -24,5 +24,5 @@ app.use(errorHandler);
 
 // Starting the server
 app.listen(PORT, () => {
-    console.log(`Server is up and running at port ${PORT}`);
+  console.log(`Server is up and running at port ${PORT}`);
 });
