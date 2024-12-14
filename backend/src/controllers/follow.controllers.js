@@ -175,7 +175,7 @@ const deleteFollower = async (req, res, next) => {
   try {
     // extract logged in user id and follower id from req
     const followingId = req.user._id; // logged in user id
-    const { id: followerId } = req.params; // follower id
+    const { followerId } = req.params; // follower id
 
     // check if user with follower id exists
     const follower = await findUserById(followerId);
