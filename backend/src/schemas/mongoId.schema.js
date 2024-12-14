@@ -18,18 +18,22 @@ const mongoIdPattern = /^[0-9a-fA-F]{24}$/;
 
 const getMongoIdSchema = (property, required = true) => {
   return required
-    ? Joi.object().keys({
-        [property]: Joi.string()
-          .regex(mongoIdPattern)
-          .message(`${property} must be a valid mongo id`)
-          .required(),
-      })
-    : Joi.object().keys({
-        [property]: Joi.string()
-          .regex(mongoIdPattern)
-          .message(`${property} must be a valid mongo id`)
-          .optional(),
-      });
+    ? Joi.object()
+        .keys({
+          [property]: Joi.string()
+            .regex(mongoIdPattern)
+            .message(`${property} must be a valid mongo id`)
+            .required(),
+        })
+        .unknown()
+    : Joi.object()
+        .keys({
+          [property]: Joi.string()
+            .regex(mongoIdPattern)
+            .message(`${property} must be a valid mongo id`)
+            .optional(),
+        })
+        .unknown();
 };
 
 export default mongoIdSchema;

@@ -11,7 +11,8 @@ import {
 const createComment = async (req, res, next) => {
   try {
     // extract logged in user id and comment payload from req
-    const { content, postId, parentId = null } = req.body;
+    const { content, parentId = null } = req.body;
+    const { postId } = req.params;
     const userId = req.user._id;
 
     // find post using post id
@@ -57,7 +58,7 @@ const deleteComment = async (req, res, next) => {
   try {
     // extract logged in user id and comment id from req
     const userId = req.user._id;
-    const commentId = req.params.id;
+    const { commentId } = req.params;
 
     // find comment using comment id and populate post field
     const comment = await findCommentById(commentId, ["post"]);

@@ -1,18 +1,20 @@
 import express from "express";
 import validate from "../middlewares/validate.middleware.js";
 import commentSchema from "../schemas/comment.schema.js";
-import authenticate from "../middlewares/authenticate.middleware.js";
+import { getMongoIdSchema } from "../schemas/mongoId.schema.js";
 import {
   createComment,
   deleteComment,
 } from "../controllers/comment.controllers.js";
-import mongoIdSchema from "../schemas/mongoId.schema.js";
 
-const router = express.Router();
-
-router.use(authenticate);
+const router = express.Router({ mergeParams: true });
 
 router.post("/", validate(commentSchema, "body"), createComment);
-router.delete("/:id", validate(mongoIdSchema, "params"), deleteComment);
+
+router.delete(
+  "/:commentId",
+  validate(getMongoIdSchema("commentId"), "params"),
+  deleteComment
+);
 
 export default router;
