@@ -95,7 +95,7 @@ const updateRequestStatus = async (req, res, next) => {
   try {
     // extract logged in user id, follow request id and new status from req
     const userId = req.user._id;
-    const { id: followRequestId } = req.params;
+    const { followRequestId } = req.params;
     const { status } = req.body;
 
     // check if follow request exists
