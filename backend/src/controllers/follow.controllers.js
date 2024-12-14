@@ -131,11 +131,11 @@ const updateRequestStatus = async (req, res, next) => {
   }
 };
 
-const unfollowUser = async (req, res, next) => {
+const deleteFromFollowings = async (req, res, next) => {
   try {
     // extract logged in user id and followed user id from req
     const followerId = req.user._id; // logged in user id
-    const { id: followingId } = req.params; // followed user id
+    const { followingId } = req.params; // followed user id
 
     // check if user with following id exists
     const followedUser = await findUserById(followingId);
@@ -214,7 +214,7 @@ const deleteFollower = async (req, res, next) => {
 export {
   sendFollowRequest,
   updateRequestStatus,
-  unfollowUser,
+  deleteFromFollowings,
   deleteFollower,
   getFollowRequestDetails,
 };
