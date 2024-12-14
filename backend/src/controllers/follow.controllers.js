@@ -9,11 +9,11 @@ import {
   updateFollowRequest,
 } from "../services/follow.services.js";
 
-const getFollowRequest = async (req, res, next) => {
+const getFollowRequestDetails = async (req, res, next) => {
   try {
     // extract logged in user id and id of the user to be followed
     const followerId = req.user._id; // logged in user id
-    const { id: followingId } = req.params; // id of the user to be followed
+    const { followingId } = req.params; // id of the user to be followed
 
     // check if user to be followed exists
     const userToFollow = await findUserById(followingId);
@@ -48,7 +48,7 @@ const sendFollowRequest = async (req, res, next) => {
   try {
     // extract user id of logged in user and the user to be followed from req
     const followerId = req.user._id; // logged in user
-    const { id: followingId } = req.params; // user to be followed
+    const { followingId } = req.params; // user to be followed
 
     // if followerId and followingId are same, throw error
     if (followerId.toString() === followingId) {
@@ -216,5 +216,5 @@ export {
   updateRequestStatus,
   unfollowUser,
   deleteFollower,
-  getFollowRequest,
+  getFollowRequestDetails,
 };

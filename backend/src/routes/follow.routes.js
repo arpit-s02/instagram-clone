@@ -5,8 +5,6 @@ import mongoIdSchema from "../schemas/mongoId.schema.js";
 import followRequestStatusSchema from "../schemas/followRequestStatus.schema.js";
 import {
   deleteFollower,
-  getFollowRequest,
-  sendFollowRequest,
   unfollowUser,
   updateRequestStatus,
 } from "../controllers/follow.controllers.js";
@@ -14,10 +12,6 @@ import {
 const router = express.Router();
 
 router.use(authenticate);
-
-router.get("/:id", validate(mongoIdSchema, "params"), getFollowRequest);
-
-router.post("/:id", validate(mongoIdSchema, "params"), sendFollowRequest);
 
 router.patch(
   "/status/:id",
