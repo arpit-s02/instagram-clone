@@ -9,12 +9,8 @@ import {
   incrementCommentsCount,
 } from "./post.services.js";
 
-const findCommentById = async (commentId, populateFields = []) => {
-  const fieldsList = populateFields.map((field) => {
-    return { path: field };
-  });
-
-  const comment = await Comment.findById(commentId).populate(fieldsList);
+const findCommentById = async (commentId) => {
+  const comment = await Comment.findById(commentId);
   return comment;
 };
 
@@ -138,17 +134,17 @@ const deleteCommentsRecursively = async (postId, commentId, session) => {
   await decrementCommentsCount(postId, session);
 };
 
-const removeComment = async (postId, comment) => {
+const removeComment = async (postId, commentId, parentId) => {
   // start a session and start a transactions
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
     // delete comment
-    await deleteCommentsRecursively(postId, comment._id, session);
+    await deleteCommentsRecursively(postId, commentId, session);
 
     // decrement parent comment's replies count
-    await decrementRepliesCount(comment.parentId, session);
+    await decrementRepliesCount(parentId, session);
 
     // commit transaction
     await session.commitTransaction();

@@ -100,20 +100,37 @@ const deleteComment = async (req, res, next) => {
   try {
     // extract logged in user id and comment id from req
     const userId = req.user._id;
-    const { commentId } = req.params;
+    const { postId, commentId } = req.params;
+
+    // find post using post id
+    const post = await getPostById(postId);
+
+    if (!post) {
+      throw new ApiError(
+        "The requested post does not exist.",
+        StatusCodes.NOT_FOUND
+      );
+    }
 
     // find comment using comment id and populate post field
-    const comment = await findCommentById(commentId, ["post"]);
+    const comment = await findCommentById(commentId);
 
     // if comment does not exist, return successful response
     if (!comment) {
       return res.status(StatusCodes.NO_CONTENT).send();
     }
 
-    // if comment does not belong to the logged in user, throw error
+    if (comment.post.toString() !== postId) {
+      throw new ApiError(
+        "Requested comment does not exist on the requested post",
+        StatusCodes.BAD_REQUEST
+      );
+    }
+
+    // if comment or post does not belong to the logged in user, throw error
     if (
       userId.toString() !== comment.user.toString() &&
-      userId.toString() !== comment.post.user.toString()
+      userId.toString() !== post.user.toString()
     ) {
       throw new ApiError(
         "User is not authorised to delete this comment",
@@ -122,7 +139,7 @@ const deleteComment = async (req, res, next) => {
     }
 
     // delete comment
-    await removeComment(comment.post._id, comment);
+    await removeComment(postId, commentId, comment.parentId);
 
     // return successful response
     return res.status(StatusCodes.NO_CONTENT).send();
