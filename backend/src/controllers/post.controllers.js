@@ -80,15 +80,15 @@ const deletePost = async (req, res, next) => {
     // find post using post id
     const post = await getPostById(postId);
 
-    // if post does not exist, throw error
+    // if post does not exist, return successful response
     if (!post) {
-      throw new ApiError("Post not found", StatusCodes.NOT_FOUND);
+      return res.status(StatusCodes.NO_CONTENT).send();
     }
 
     // check if post belongs to the logged in user, if not throw error
     if (post.user.toString() !== userId.toString()) {
       throw new ApiError(
-        "A user cannot delete a post of another user",
+        "User is not authorised to delete this post",
         StatusCodes.FORBIDDEN
       );
     }

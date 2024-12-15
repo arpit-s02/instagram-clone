@@ -151,12 +151,9 @@ const deleteFromFollowings = async (req, res, next) => {
     // check if relationship exists between users
     const followRequest = await findFollowRequest(followerId, followingId);
 
-    // if relationship does not exist, throw error
+    // if relationship does not exist, return successful response
     if (!followRequest) {
-      throw new ApiError(
-        "Follow request does not exist",
-        StatusCodes.NOT_FOUND
-      );
+      return res.json({ message: "Unfollowed the user successfully" });
     }
 
     // delete follow request
@@ -191,12 +188,9 @@ const deleteFollower = async (req, res, next) => {
     // check if relationship exists between users
     const followRequest = await findFollowRequest(followerId, followingId);
 
-    // if relationship does not exist, throw error
+    // if relationship does not exist, return successful response
     if (!followRequest) {
-      throw new ApiError(
-        "Follow request does not exist",
-        StatusCodes.NOT_FOUND
-      );
+      return res.json({ message: "Follower removed successfully" });
     }
 
     // delete follow request
