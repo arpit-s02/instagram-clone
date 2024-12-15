@@ -5,11 +5,18 @@ import { getMongoIdSchema } from "../schemas/mongoId.schema.js";
 import {
   createComment,
   deleteComment,
+  getComments,
 } from "../controllers/comment.controllers.js";
 
 const router = express.Router({ mergeParams: true });
 
 router.post("/", validate(commentSchema, "body"), createComment);
+
+router.get(
+  "/:parentId?",
+  validate(getMongoIdSchema("parentId", false), "params"),
+  getComments
+);
 
 router.delete(
   "/:commentId",

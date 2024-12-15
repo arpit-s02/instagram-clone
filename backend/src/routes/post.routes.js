@@ -1,8 +1,8 @@
 import express from "express";
 import authenticate from "../middlewares/authenticate.middleware.js";
 import validate from "../middlewares/validate.middleware.js";
-import postLikeRoutes from "./postLike.routes.js";
-import postCommentRoutes from "./postComment.routes.js";
+import postLikeRoutes from "./post-like.routes.js";
+import postCommentRoutes from "./post-comment.routes.js";
 import { getFeed, getUploads } from "../controllers/post.controllers.js";
 import { getMongoIdSchema } from "../schemas/mongoId.schema.js";
 import { upload } from "../middlewares/multer.middleware.js";

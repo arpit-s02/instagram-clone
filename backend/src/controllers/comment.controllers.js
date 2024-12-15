@@ -1,12 +1,56 @@
+import ApiError from "../utils/ApiError.js";
 import { StatusCodes } from "http-status-codes";
 import { getPostById } from "../services/post.services.js";
-import ApiError from "../utils/ApiError.js";
 import {
   findCommentById,
   findCommentOnPost,
+  findCommentsByPostAndParentId,
   insertComment,
   removeComment,
 } from "../services/comment.services.js";
+
+const getComments = async (req, res, next) => {
+  try {
+    // default values for current page and limit
+    const defaultPage = 1;
+    const defaultLimit = 5;
+
+    // current page and limit
+    const page = parseInt(req.query.page) || defaultPage;
+    const limit = parseInt(req.query.limit) || defaultLimit;
+
+    // extract post id and parent id from req
+    const { postId, parentId = null } = req.params;
+
+    // if parent id is not null, find parent comment
+    if (parentId) {
+      const parentComment = await findCommentById(parentId);
+
+      // if parent comment not found, throw error
+      if (!parentComment) {
+        throw new ApiError(
+          "The specified parent comment does not exist or may have been deleted.",
+          StatusCodes.NOT_FOUND
+        );
+      }
+    }
+
+    // find comments
+    const comments = await findCommentsByPostAndParentId(
+      postId,
+      parentId,
+      page,
+      limit
+    );
+
+    // return successful response
+    return res.json(comments);
+  } catch (error) {
+    // handle error
+    console.error(error);
+    next(error);
+  }
+};
 
 const createComment = async (req, res, next) => {
   try {
@@ -20,7 +64,10 @@ const createComment = async (req, res, next) => {
 
     // if post does not exist, throw error
     if (!post) {
-      throw new ApiError("Post not found", StatusCodes.NOT_FOUND);
+      throw new ApiError(
+        "The requested post does not exist.",
+        StatusCodes.NOT_FOUND
+      );
     }
 
     if (parentId) {
@@ -29,20 +76,15 @@ const createComment = async (req, res, next) => {
 
       // if parent comment does not exist, throw error
       if (!parentComment) {
-        throw new ApiError("Parent comment not found", StatusCodes.NOT_FOUND);
+        throw new ApiError(
+          "The specified parent comment does not exist or may have been deleted.",
+          StatusCodes.NOT_FOUND
+        );
       }
     }
 
     // create comment
-    const newComment = await insertComment(
-      {
-        post: postId,
-        user: userId,
-        content,
-        parentId,
-      },
-      parentId
-    );
+    const newComment = await insertComment(postId, userId, content, parentId);
 
     // return comment as response
     const { createdAt, updatedAt, __v, ...response } = newComment._doc;
@@ -80,7 +122,7 @@ const deleteComment = async (req, res, next) => {
     }
 
     // delete comment
-    await removeComment(comment);
+    await removeComment(comment.post._id, comment);
 
     // return successful response
     return res.status(StatusCodes.NO_CONTENT).send();
@@ -91,4 +133,4 @@ const deleteComment = async (req, res, next) => {
   }
 };
 
-export { createComment, deleteComment };
+export { getComments, createComment, deleteComment };

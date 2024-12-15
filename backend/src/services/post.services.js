@@ -1,65 +1,95 @@
 import Post from "../models/post.model.js";
 
 const getPostById = async (postId) => {
-    const post = await Post.findById(postId);
-    return post;
+  const post = await Post.findById(postId);
+  return post;
 };
 
 const getUserUploads = async (userId) => {
-    const uploads = await Post.find({ user: userId }, { __v: false }).sort({
-        createdAt: -1,
-    });
+  const uploads = await Post.find({ user: userId }, { __v: false }).sort({
+    createdAt: -1,
+  });
 
-    return uploads;
+  return uploads;
 };
 
 const findPosts = async (userIds, page, limit) => {
-    const skipCount = (page - 1) * limit;
+  const skipCount = (page - 1) * limit;
 
-    const posts = await Post.aggregate([
-        {
-            $match: { user: { $in: userIds } },
+  const posts = await Post.aggregate([
+    {
+      $match: { user: { $in: userIds } },
+    },
+    {
+      $facet: {
+        totalPosts: [{ $count: "count" }],
+        data: [
+          // { $project: { __v: false } },
+          { $skip: skipCount },
+          { $limit: limit },
+          { $sort: { createdAt: -1 } },
+        ],
+      },
+    },
+    {
+      $project: {
+        totalPosts: {
+          $ifNull: [{ $arrayElemAt: ["$totalPosts.count", 0] }, 0],
         },
-        {
-            $facet: {
-                totalPosts: [{ $count: "count" }],
-                data: [
-                    // { $project: { __v: false } },
-                    { $skip: skipCount },
-                    { $limit: limit },
-                    { $sort: { createdAt: -1 } },
-                ],
-            },
-        },
-        {
-            $project: {
-                totalPosts: {
-                    $ifNull: [{ $arrayElemAt: ["$totalPosts.count", 0] }, 0],
-                },
-                data: true,
-            },
-        },
-    ]);
+        data: true,
+      },
+    },
+  ]);
 
-    const totalPages = Math.ceil(posts[0].totalPosts / limit);
+  const totalPages = Math.ceil(posts[0].totalPosts / limit);
 
-    return {
-        ...posts[0],
-        pagination: {
-            currentPage: page,
-            limit,
-            totalPages,
-        },
-    };
+  return {
+    ...posts[0],
+    pagination: {
+      currentPage: page,
+      limit,
+      totalPages,
+    },
+  };
 };
 
 const createPost = async (post) => {
-    const newPost = await Post.create(post);
-    return newPost;
+  const newPost = await Post.create(post);
+  return newPost;
 };
 
 const removePost = async (postId) => {
-    await Post.findByIdAndDelete(postId);
+  await Post.findByIdAndDelete(postId);
 };
 
-export { createPost, getPostById, getUserUploads, findPosts, removePost };
+const incrementCommentsCount = async (postId, session) => {
+  const incrementValue = 1;
+  await Post.findByIdAndUpdate(
+    postId,
+    {
+      $inc: { commentsCount: incrementValue },
+    },
+    { session }
+  );
+};
+
+const decrementCommentsCount = async (postId, session) => {
+  const incrementValue = -1;
+  await Post.findByIdAndUpdate(
+    postId,
+    {
+      $inc: { commentsCount: incrementValue },
+    },
+    { session }
+  );
+};
+
+export {
+  createPost,
+  getPostById,
+  getUserUploads,
+  findPosts,
+  removePost,
+  incrementCommentsCount,
+  decrementCommentsCount,
+};
