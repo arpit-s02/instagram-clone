@@ -1,5 +1,9 @@
 import mongoose from "mongoose";
 import Like from "../models/likes.model.js";
+import { targetModels } from "../utils/targetModelTypes.js";
+import ApiError from "../utils/ApiError.js";
+import { StatusCodes } from "http-status-codes";
+import { incrementPostLikesCount } from "./post.services.js";
 
 const getLikesById = async (targetId, page, limit) => {
   const skipCount = (page - 1) * limit;
@@ -47,14 +51,69 @@ const findLikeByUserId = async (userId, targetId) => {
   return like;
 };
 
-const insertLike = async (userId, targetId, targetModel) => {
-  const like = await Like.create({
-    user: userId,
-    target: targetId,
-    targetModel,
-  });
+const insertLike = async (userId, targetId, targetModel, session) => {
+  const result = await Like.create(
+    // to pass session to Model.create(), array of new docs must be passed
+    [
+      {
+        user: userId,
+        target: targetId,
+        targetModel,
+      },
+    ],
+    { session }
+  );
 
+  const like = result[0]; // result is an array containing all new docs
   return like;
+};
+
+const incrementLikesCountOnTarget = async (targetId, targetModel, session) => {
+  switch (targetModel) {
+    case targetModels.POST:
+      const post = await incrementPostLikesCount(targetId, session);
+
+      return {
+        postId: post._id,
+        updatedLikesCount: post.likesCount,
+      };
+
+    default:
+      throw new ApiError("Invalid target model", StatusCodes.BAD_REQUEST);
+  }
+};
+
+const handleCreateLike = async (userId, targetId, targetModel) => {
+  // create a session and start a transaction
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    // create like
+    const like = await insertLike(userId, targetId, targetModel, session);
+
+    // increment likes count on target
+    const result = await incrementLikesCountOnTarget(
+      targetId,
+      targetModel,
+      session
+    );
+
+    // commit transaction
+    await session.commitTransaction();
+
+    // return result object
+    return { ...result, likeId: like._id };
+  } catch (error) {
+    //abort the transaction if any error occurs
+    await session.abortTransaction();
+
+    console.error(error);
+    throw new ApiError(
+      "Failed to create like",
+      StatusCodes.INTERNAL_SERVER_ERROR
+    );
+  }
 };
 
 const deleteLike = async (id) => {
@@ -69,6 +128,7 @@ export {
   getLikesById,
   findLikeByUserId,
   insertLike,
+  handleCreateLike,
   deleteLike,
   deleteAllLikesOnTarget,
 };

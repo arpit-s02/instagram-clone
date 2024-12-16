@@ -12,9 +12,10 @@ import {
   deleteLike,
   findLikeByUserId,
   getLikesById,
-  insertLike,
+  handleCreateLike,
 } from "../services/like.services.js";
 import { findUserFollowing } from "../services/follow.services.js";
+import { targetModels } from "../utils/targetModelTypes.js";
 
 const getPost = async (req, res, next) => {
   try {
@@ -200,16 +201,20 @@ const createPostLike = async (req, res, next) => {
 
     // if like already exists, return successful response
     if (like) {
-      const { createdAt, updatedAt, __v, ...response } = like._doc;
+      const response = {
+        likeId: like._id,
+        postId,
+        updatedLikesCount: post.likesCount,
+      };
+
       return res.status(StatusCodes.OK).json(response);
     }
 
     // create a like
-    const targetModel = "Post";
-    const newLike = await insertLike(userId, postId, targetModel);
+    const targetModel = targetModels.POST;
+    const response = await handleCreateLike(userId, postId, targetModel);
 
     // return successful response
-    const { createdAt, updatedAt, __v, ...response } = newLike._doc;
     return res.status(StatusCodes.CREATED).json(response);
   } catch (error) {
     // handle error

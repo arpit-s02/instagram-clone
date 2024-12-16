@@ -84,6 +84,20 @@ const decrementCommentsCount = async (postId, session) => {
   );
 };
 
+const incrementPostLikesCount = async (postId, session) => {
+  const incrementValue = 1;
+
+  const post = await Post.findByIdAndUpdate(
+    postId,
+    {
+      $inc: { likesCount: incrementValue },
+    },
+    { new: true, session }
+  );
+
+  return post;
+};
+
 export {
   createPost,
   getPostById,
@@ -92,4 +106,5 @@ export {
   removePost,
   incrementCommentsCount,
   decrementCommentsCount,
+  incrementPostLikesCount,
 };
