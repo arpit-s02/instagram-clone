@@ -98,6 +98,24 @@ const incrementPostLikesCount = async (postId, session) => {
   return post;
 };
 
+const decrementPostLikesCount = async (postId, session) => {
+  const incrementValue = -1;
+
+  const post = await Post.findByIdAndUpdate(
+    postId,
+    {
+      $inc: { likesCount: incrementValue },
+    },
+    { new: true, session }
+  );
+
+  if (post.likesCount < 0) {
+    throw new Error("Likes count cannot be less than 0");
+  }
+
+  return post;
+};
+
 export {
   createPost,
   getPostById,
@@ -107,4 +125,5 @@ export {
   incrementCommentsCount,
   decrementCommentsCount,
   incrementPostLikesCount,
+  decrementPostLikesCount,
 };

@@ -9,10 +9,10 @@ import {
   removePost,
 } from "../services/post.services.js";
 import {
-  deleteLike,
   findLikeByUserId,
   getLikesById,
   handleCreateLike,
+  handleDeleteLike,
 } from "../services/like.services.js";
 import { findUserFollowing } from "../services/follow.services.js";
 import { targetModels } from "../utils/targetModelTypes.js";
@@ -242,14 +242,15 @@ const deletePostLike = async (req, res, next) => {
 
     // if like does not exist, return successful response
     if (!like) {
-      return res.status(StatusCodes.NO_CONTENT).send();
+      return res.json({ postId, updatedLikesCount: post.likesCount });
     }
 
     // delete like
-    await deleteLike(like._id);
+    const targetModel = targetModels.POST;
+    const response = await handleDeleteLike(like._id, postId, targetModel);
 
     // return successful response
-    return res.status(StatusCodes.NO_CONTENT).send();
+    return res.json(response);
   } catch (error) {
     // handle error
     console.error(error);
