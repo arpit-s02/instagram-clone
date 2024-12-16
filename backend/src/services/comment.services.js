@@ -3,7 +3,6 @@ import Comment from "../models/comment.model.js";
 import ApiError from "../utils/ApiError.js";
 import { StatusCodes } from "http-status-codes";
 import { deleteAllLikesOnTarget } from "./like.services.js";
-import { ObjectId } from "mongodb";
 import {
   decrementCommentsCount,
   incrementCommentsCount,
@@ -28,11 +27,6 @@ const findCommentsByPostAndParentId = async (postId, parentId, page, limit) => {
     .limit(limit);
 
   return comments;
-};
-
-const findRepliesOnComment = async (commentId) => {
-  const replies = await Comment.find({ parentId: commentId });
-  return replies;
 };
 
 const findCommentOnPost = async (commentId, postId) => {
@@ -108,6 +102,11 @@ const deleteCommentById = async (commentId, session) => {
   return comment;
 };
 
+const findRepliesOnComment = async (commentId) => {
+  const replies = await Comment.find({ parentId: commentId });
+  return replies;
+};
+
 /**
  * Recursively deletes a comment and all its nested replies, including likes.
  * @param {String} postId - id of the post the comment belongs to
@@ -162,10 +161,25 @@ const removeComment = async (postId, commentId, parentId) => {
   }
 };
 
+const incrementCommentLikesCount = async (commentId, session) => {
+  const incrementValue = 1;
+
+  const comment = await Comment.findByIdAndUpdate(
+    commentId,
+    {
+      $inc: { likesCount: incrementValue },
+    },
+    { new: true, session }
+  );
+
+  return comment;
+};
+
 export {
   findCommentById,
   findCommentsByPostAndParentId,
   findCommentOnPost,
   insertComment,
   removeComment,
+  incrementCommentLikesCount,
 };

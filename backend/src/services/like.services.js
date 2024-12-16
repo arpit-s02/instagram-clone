@@ -7,6 +7,7 @@ import {
   decrementPostLikesCount,
   incrementPostLikesCount,
 } from "./post.services.js";
+import { incrementCommentLikesCount } from "./comment.services.js";
 
 const findLikesById = async (targetId, page, limit) => {
   const skipCount = (page - 1) * limit;
@@ -51,6 +52,10 @@ const incrementLikesCountOnTarget = async (targetId, targetModel, session) => {
         postId: post._id,
         updatedLikesCount: post.likesCount,
       };
+
+    case targetModels.COMMENT:
+      const comment = await incrementCommentLikesCount(targetId, session);
+      return { commentId: comment._id, updatedLikesCount: comment.likesCount };
 
     default:
       throw new Error("Invalid target model");

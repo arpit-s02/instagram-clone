@@ -8,6 +8,11 @@ import {
   insertComment,
   removeComment,
 } from "../services/comment.services.js";
+import {
+  findLikeByUserId,
+  handleCreateLike,
+} from "../services/like.services.js";
+import { targetModels } from "../utils/targetModelTypes.js";
 
 const getComments = async (req, res, next) => {
   try {
@@ -150,4 +155,46 @@ const deleteComment = async (req, res, next) => {
   }
 };
 
-export { getComments, createComment, deleteComment };
+const createCommentLike = async (req, res, next) => {
+  try {
+    // extract user id, post id and comment id from req
+    const userId = req.user._id;
+    const { postId, commentId } = req.params;
+
+    // find comment on post
+    const comment = await findCommentOnPost(commentId, postId);
+
+    // if comment not found, throw error
+    if (!comment) {
+      throw new ApiError(
+        "Requested comment does not exist on requested post",
+        StatusCodes.NOT_FOUND
+      );
+    }
+
+    // find like of user on comment
+    const like = await findLikeByUserId(userId, commentId);
+
+    // if like already exists, return successful response
+    if (like) {
+      return res.json({
+        commentId,
+        updatedLikesCount: comment.likesCount,
+        likeId: like._id,
+      });
+    }
+
+    // create like on comment
+    const targetModel = targetModels.COMMENT;
+    const response = await handleCreateLike(userId, commentId, targetModel);
+
+    // return response
+    return res.status(StatusCodes.CREATED).json(response);
+  } catch (error) {
+    // handle error
+    console.error(error);
+    next(error);
+  }
+};
+
+export { getComments, createComment, deleteComment, createCommentLike };
