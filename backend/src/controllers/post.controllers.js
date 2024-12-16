@@ -3,7 +3,7 @@ import { uploadToCloudinary } from "../utils/cloudinary.js";
 import { StatusCodes } from "http-status-codes";
 import {
   createPost,
-  findPosts,
+  findFeedPosts,
   getPostById,
   getUserUploads,
   removePost,
@@ -124,7 +124,7 @@ const getFeed = async (req, res, next) => {
     const userIds = userFollowing.map((relation) => relation.following);
 
     // find posts of the users (following) using current page and limit
-    const posts = await findPosts(userIds, page, limit);
+    const posts = await findFeedPosts(userIds, page, limit);
 
     // return posts as response
     return res.json(posts);

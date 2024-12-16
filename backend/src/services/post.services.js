@@ -13,44 +13,15 @@ const getUserUploads = async (userId) => {
   return uploads;
 };
 
-const findPosts = async (userIds, page, limit) => {
+const findFeedPosts = async (userIds, page, limit) => {
   const skipCount = (page - 1) * limit;
 
-  const posts = await Post.aggregate([
-    {
-      $match: { user: { $in: userIds } },
-    },
-    {
-      $facet: {
-        totalPosts: [{ $count: "count" }],
-        data: [
-          // { $project: { __v: false } },
-          { $skip: skipCount },
-          { $limit: limit },
-          { $sort: { createdAt: -1 } },
-        ],
-      },
-    },
-    {
-      $project: {
-        totalPosts: {
-          $ifNull: [{ $arrayElemAt: ["$totalPosts.count", 0] }, 0],
-        },
-        data: true,
-      },
-    },
-  ]);
+  const posts = await Post.find({ user: { $in: userIds } }, { __v: false })
+    .sort({ createdAt: -1 })
+    .skip(skipCount)
+    .limit(limit);
 
-  const totalPages = Math.ceil(posts[0].totalPosts / limit);
-
-  return {
-    ...posts[0],
-    pagination: {
-      currentPage: page,
-      limit,
-      totalPages,
-    },
-  };
+  return posts;
 };
 
 const createPost = async (post) => {
@@ -120,7 +91,7 @@ export {
   createPost,
   getPostById,
   getUserUploads,
-  findPosts,
+  findFeedPosts,
   removePost,
   incrementCommentsCount,
   decrementCommentsCount,
