@@ -10,7 +10,7 @@ import {
 } from "../services/post.services.js";
 import {
   findLikeByUserId,
-  getLikesById,
+  findLikesById,
   handleCreateLike,
   handleDeleteLike,
 } from "../services/like.services.js";
@@ -172,7 +172,7 @@ const getPostLikes = async (req, res, next) => {
     }
 
     // fetch likes for the post using postId, page and limit
-    const likes = await getLikesById(postId, page, limit);
+    const likes = await findLikesById(postId, page, limit);
 
     // return likes as response
     return res.json(likes);
