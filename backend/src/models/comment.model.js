@@ -21,6 +21,10 @@ const commentSchema = new mongoose.Schema(
       ref: "Comment",
       default: null,
     },
+    likesCount: {
+      type: Number,
+      default: 0,
+    },
     repliesCount: {
       type: Number,
       default: 0,
