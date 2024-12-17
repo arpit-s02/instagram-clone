@@ -175,6 +175,24 @@ const incrementCommentLikesCount = async (commentId, session) => {
   return comment;
 };
 
+const decrementCommentLikesCount = async (commentId, session) => {
+  const incrementValue = -1;
+
+  const comment = await Comment.findByIdAndUpdate(
+    commentId,
+    {
+      $inc: { likesCount: incrementValue },
+    },
+    { new: true, session }
+  );
+
+  if (comment.likesCount < 0) {
+    throw error("Likes count cannot be less than 0");
+  }
+
+  return comment;
+};
+
 export {
   findCommentById,
   findCommentsByPostAndParentId,
@@ -182,4 +200,5 @@ export {
   insertComment,
   removeComment,
   incrementCommentLikesCount,
+  decrementCommentLikesCount,
 };
