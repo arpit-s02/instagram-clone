@@ -2,10 +2,10 @@ import ApiError from "../utils/ApiError.js";
 import { uploadToCloudinary } from "../utils/cloudinary.js";
 import { StatusCodes } from "http-status-codes";
 import {
-  createPost,
   findFeedPosts,
   getPostById,
   getUserUploads,
+  handleCreatePost,
   removePost,
 } from "../services/post.services.js";
 import {
@@ -61,13 +61,15 @@ const createNewPost = async (req, res, next) => {
     }
 
     // create a new post in db and pass media urls array, caption and user id
-    await createPost({ media: mediaUrls, caption, user });
+    await handleCreatePost({ media: mediaUrls, caption, user });
 
     // send a response
     return res
       .status(StatusCodes.CREATED)
       .send({ message: "Post created successfully" });
   } catch (error) {
+    // handle error
+    console.error(error);
     next(error);
   }
 };
