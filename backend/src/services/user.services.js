@@ -32,10 +32,27 @@ const incrementPostsCount = async (userId, session) => {
   return user;
 };
 
+const decrementPostsCount = async (userId, session) => {
+  const incrementValue = -1;
+
+  const user = await User.findByIdAndUpdate(
+    userId,
+    { $inc: { postsCount: incrementValue } },
+    { new: true, session }
+  );
+
+  if (user.postsCount < 0) {
+    throw new Error("Posts count cannot be less than 0");
+  }
+
+  return user;
+};
+
 export {
   createUser,
   findUserByEmail,
   findUserById,
   findUserByUsername,
   incrementPostsCount,
+  decrementPostsCount,
 };

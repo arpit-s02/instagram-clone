@@ -6,7 +6,7 @@ import {
   getPostById,
   getUserUploads,
   handleCreatePost,
-  removePost,
+  handleDeletePost,
 } from "../services/post.services.js";
 import {
   findLikeByUserId,
@@ -97,7 +97,7 @@ const deletePost = async (req, res, next) => {
     }
 
     // delete post
-    await removePost(postId);
+    await handleDeletePost(postId, userId);
 
     // return successful response
     return res.status(StatusCodes.NO_CONTENT).send();

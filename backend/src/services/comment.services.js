@@ -34,6 +34,11 @@ const findCommentOnPost = async (commentId, postId) => {
   return comment;
 };
 
+const findAllCommentsOnPost = async (postId) => {
+  const comments = await Comment.find({ post: postId });
+  return comments;
+};
+
 const incrementRepliesCount = async (commentId, session) => {
   await Comment.findByIdAndUpdate(
     commentId,
@@ -161,6 +166,10 @@ const removeComment = async (postId, commentId, parentId) => {
   }
 };
 
+const deleteAllCommentsOnPost = async (postId, session) => {
+  await Comment.deleteMany({ post: postId }, { session });
+};
+
 const incrementCommentLikesCount = async (commentId, session) => {
   const incrementValue = 1;
 
@@ -197,8 +206,10 @@ export {
   findCommentById,
   findCommentsByPostAndParentId,
   findCommentOnPost,
+  findAllCommentsOnPost,
   insertComment,
   removeComment,
+  deleteAllCommentsOnPost,
   incrementCommentLikesCount,
   decrementCommentLikesCount,
 };

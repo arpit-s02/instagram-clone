@@ -160,10 +160,15 @@ const deleteAllLikesOnTarget = async (targetId, session) => {
   await Like.deleteMany({ target: targetId }, { session });
 };
 
+const deleteAllLikesOnTargets = async (targetIds, session) => {
+  await Like.deleteMany({ target: { $in: targetIds } }, { session });
+};
+
 export {
   findLikesById,
   findLikeByUserId,
   handleCreateLike,
   handleDeleteLike,
   deleteAllLikesOnTarget,
+  deleteAllLikesOnTargets,
 };
