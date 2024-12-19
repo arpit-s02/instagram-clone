@@ -48,6 +48,34 @@ const decrementPostsCount = async (userId, session) => {
   return user;
 };
 
+const incrementFollowersCount = async (userId, session) => {
+  const incrementValue = 1;
+
+  const user = await User.findByIdAndUpdate(
+    userId,
+    {
+      $inc: { followersCount: incrementValue },
+    },
+    { new: true, session }
+  );
+
+  return user;
+};
+
+const incrementFollowingsCount = async (userId, session) => {
+  const incrementValue = 1;
+
+  const user = await User.findByIdAndUpdate(
+    userId,
+    {
+      $inc: { followingsCount: incrementValue },
+    },
+    { new: true, session }
+  );
+
+  return user;
+};
+
 export {
   createUser,
   findUserByEmail,
@@ -55,4 +83,6 @@ export {
   findUserByUsername,
   incrementPostsCount,
   decrementPostsCount,
+  incrementFollowersCount,
+  incrementFollowingsCount,
 };

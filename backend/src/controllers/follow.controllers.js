@@ -5,9 +5,10 @@ import {
   createFollowRequest,
   findFollowRequest,
   findFollowRequestById,
+  processFollowRequest,
   removeFollowRequest,
-  updateFollowRequest,
 } from "../services/follow.services.js";
+import { followStatus } from "../utils/followStatusTypes.js";
 
 const getFollowRequestDetails = async (req, res, next) => {
   try {
@@ -106,6 +107,14 @@ const updateRequestStatus = async (req, res, next) => {
       throw new ApiError("Follow request not found", StatusCodes.NOT_FOUND);
     }
 
+    // if follow request status is not pending, throw error
+    if (followRequest.status !== followStatus.PENDING) {
+      throw new ApiError(
+        "Follow request already processed",
+        StatusCodes.CONFLICT
+      );
+    }
+
     // if logged in user id is not equal to following id, throw error
     if (userId.toString() !== followRequest.following.toString()) {
       throw new ApiError(
@@ -115,9 +124,12 @@ const updateRequestStatus = async (req, res, next) => {
     }
 
     // update follow request status
-    const updatedFollowRequest = await updateFollowRequest(followRequestId, {
+    const updatedFollowRequest = await processFollowRequest(
+      followRequestId,
       status,
-    });
+      followRequest.follower,
+      followRequest.following
+    );
 
     // return updated follow request as response
     const { createdAt, updatedAt, __v, ...response } =

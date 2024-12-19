@@ -26,6 +26,14 @@ const userSchema = new mongoose.Schema(
     bio: {
       type: String,
     },
+    followersCount: {
+      type: Number,
+      default: 0,
+    },
+    followingsCount: {
+      type: Number,
+      default: 0,
+    },
     postsCount: {
       type: Number,
       default: 0,
