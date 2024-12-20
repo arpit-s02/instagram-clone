@@ -1,12 +1,14 @@
 import mongoose from "mongoose";
 import Follow from "../models/follow.model.js";
+import ApiError from "../utils/ApiError.js";
 import { StatusCodes } from "http-status-codes";
 import { followStatus } from "../utils/followStatusTypes.js";
 import {
+  decrementFollowersCount,
+  decrementFollowingsCount,
   incrementFollowersCount,
   incrementFollowingsCount,
 } from "./user.services.js";
-import ApiError from "../utils/ApiError.js";
 
 const findUserFollowing = async (userId) => {
   const userFollowing = await Follow.find(
@@ -133,8 +135,51 @@ const processFollowRequest = async (
   }
 };
 
-const removeFollowRequest = async (followRequestId) => {
-  await Follow.findByIdAndDelete(followRequestId);
+const deleteFollowRequestById = async (followRequestId, session) => {
+  const deletedFollowRequest = await Follow.findByIdAndDelete(followRequestId, {
+    session,
+  });
+
+  return deletedFollowRequest;
+};
+
+const removeFollowRequest = async (
+  followRequestId,
+  followerId,
+  followingId
+) => {
+  // start a session and start a transaction
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    // delete follow request
+    const deletedFollowRequest = await deleteFollowRequestById(
+      followRequestId,
+      session
+    );
+
+    // if follow request status was accepted, decrement followers and followings count
+    if (
+      deletedFollowRequest &&
+      deletedFollowRequest.status === followStatus.ACCEPTED
+    ) {
+      await decrementFollowingsCount(followerId, session); // decrement followings count of follower
+      await decrementFollowersCount(followingId, session); // decrement followers count of user being followed
+    }
+
+    // commit transaction
+    await session.commitTransaction();
+  } catch (error) {
+    // if any error occurs, abort the transaction
+    await session.abortTransaction();
+
+    console.error(error);
+    throw new ApiError("Failed to delete follow request");
+  } finally {
+    // end the session
+    await session.endSession();
+  }
 };
 
 export {
