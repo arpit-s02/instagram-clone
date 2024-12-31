@@ -10,6 +10,7 @@ import {
 } from "../services/comment.services.js";
 import {
   findLikeByUserId,
+  findLikesById,
   handleCreateLike,
   handleDeleteLike,
 } from "../services/like.services.js";
@@ -153,6 +154,50 @@ const deleteComment = async (req, res, next) => {
   }
 };
 
+const getCommentLikes = async (req, res, next) => {
+  try {
+    // default values for page and limit
+    const defaultPage = 1;
+    const defaultLimit = 20;
+
+    // extract postId, commentId, page and limit from req
+    const { postId, commentId } = req.params;
+    const page = parseInt(req.query.page) || defaultPage;
+    const limit = parseInt(req.query.limit) || defaultLimit;
+
+    // find post by postId
+    const post = await getPostById(postId);
+
+    // if post is not found, throw error
+    if (!post) {
+      throw new ApiError(
+        "Requested post does not exist",
+        StatusCodes.NOT_FOUND
+      );
+    }
+
+    // find comment on the post
+    const comment = await findCommentOnPost(commentId, postId);
+
+    // if comment does not exist on post, throw error
+    if (!comment) {
+      throw new ApiError(
+        "Requested comment does not exist on requested post",
+        StatusCodes.NOT_FOUND
+      );
+    }
+
+    // fetch likes for the comment using commentId, page and limit
+    const likes = await findLikesById(commentId, page, limit);
+
+    // return likes as response
+    return res.json(likes);
+  } catch (error) {
+    // pass error to error handling middleware
+    next(error);
+  }
+};
+
 const createCommentLike = async (req, res, next) => {
   try {
     // extract user id, post id and comment id from req
@@ -235,6 +280,7 @@ export {
   getComments,
   createComment,
   deleteComment,
+  getCommentLikes,
   createCommentLike,
   deleteCommentLike,
 };
