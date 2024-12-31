@@ -10,14 +10,14 @@ import {
   incrementFollowingsCount,
 } from "./user.services.js";
 
-const findUserFollowing = async (userId) => {
+const findUserFollowings = async (userId) => {
   const userFollowing = await Follow.find(
     {
       follower: userId,
       status: followStatus.ACCEPTED,
     },
     { createdAt: false, updatedAt: false, __v: false }
-  );
+  ).populate("following", "-password -createdAt -updatedAt -__v");
 
   return userFollowing;
 };
@@ -180,7 +180,7 @@ const removeFollowRequest = async (
 };
 
 export {
-  findUserFollowing,
+  findUserFollowings,
   createFollowRequest,
   findFollowRequest,
   findFollowRequestById,

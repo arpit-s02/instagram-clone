@@ -14,7 +14,7 @@ import {
   handleCreateLike,
   handleDeleteLike,
 } from "../services/like.services.js";
-import { findUserFollowing } from "../services/follow.services.js";
+import { findUserFollowings } from "../services/follow.services.js";
 import { targetModels } from "../utils/targetModelTypes.js";
 import { findUserByUsername } from "../services/user.services.js";
 
@@ -119,10 +119,10 @@ const getFeed = async (req, res, next) => {
     const limit = parseInt(req.query.limit) || defaultLimit;
 
     // find users that the logged in user follows (following)
-    const userFollowing = await findUserFollowing(userId);
+    const userFollowings = await findUserFollowings(userId);
 
     // create an array of ids of users (following)
-    const userIds = userFollowing.map((relation) => relation.following);
+    const userIds = userFollowings.map((relation) => relation.following._id);
 
     // find posts of the users (following) using current page and limit
     const posts = await findFeedPosts(userIds, page, limit);

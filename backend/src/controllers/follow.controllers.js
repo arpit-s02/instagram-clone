@@ -1,10 +1,11 @@
 import { StatusCodes } from "http-status-codes";
-import { findUserById } from "../services/user.services.js";
+import { findUserById, findUserByUsername } from "../services/user.services.js";
 import ApiError from "../utils/ApiError.js";
 import {
   createFollowRequest,
   findFollowRequest,
   findFollowRequestById,
+  findUserFollowings,
   processFollowRequest,
   removeFollowRequest,
 } from "../services/follow.services.js";
@@ -38,6 +39,42 @@ const getFollowRequestDetails = async (req, res, next) => {
     // return follow request as response
     const { createdAt, updatedAt, __v, ...response } = followRequest._doc;
     return res.json(response);
+  } catch (error) {
+    // handle error
+    next(error);
+  }
+};
+
+const getFollowings = async (req, res, next) => {
+  try {
+    // extract username from req
+    const { username } = req.params;
+
+    let user;
+
+    // if username is equal to logged in user's username, set user as logged in user
+    if (username === req.user.username) {
+      user = req.user;
+    }
+
+    // else find user using username
+    else {
+      user = await findUserByUsername(username);
+    }
+
+    // if user does not exist, throw error
+    if (!user) {
+      throw new ApiError(
+        "Requested user does not exist",
+        StatusCodes.NOT_FOUND
+      );
+    }
+
+    // find user's followings
+    const userFollowings = await findUserFollowings(user._id);
+
+    // return user's followings as response
+    return res.json(userFollowings);
   } catch (error) {
     // handle error
     next(error);
@@ -184,5 +221,6 @@ export {
   sendFollowRequest,
   updateRequestStatus,
   getFollowRequestDetails,
+  getFollowings,
   deleteFollowRequest,
 };

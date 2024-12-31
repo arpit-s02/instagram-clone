@@ -6,6 +6,7 @@ import authenticate from "../middlewares/authenticate.middleware.js";
 import { getMongoIdSchema } from "../schemas/mongoId.schema.js";
 import { getUploads } from "../controllers/post.controllers.js";
 import {
+  getFollowings,
   getFollowRequestDetails,
   sendFollowRequest,
 } from "../controllers/follow.controllers.js";
@@ -29,6 +30,8 @@ router.get("/me", getAuthenticatedUserDetails);
 router.get("/:username", getUserDetails);
 
 router.get("/:username/uploads", getUploads);
+
+router.get("/:username/followings", getFollowings);
 
 router.post(
   "/:followingId/follow",
