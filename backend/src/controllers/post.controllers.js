@@ -3,8 +3,8 @@ import { uploadToCloudinary } from "../utils/cloudinary.js";
 import { StatusCodes } from "http-status-codes";
 import {
   findFeedPosts,
+  findUploads,
   getPostById,
-  getUserUploads,
   handleCreatePost,
   handleDeletePost,
 } from "../services/post.services.js";
@@ -16,6 +16,7 @@ import {
 } from "../services/like.services.js";
 import { findUserFollowing } from "../services/follow.services.js";
 import { targetModels } from "../utils/targetModelTypes.js";
+import { findUserByUsername } from "../services/user.services.js";
 
 const getPost = async (req, res, next) => {
   try {
@@ -136,13 +137,30 @@ const getFeed = async (req, res, next) => {
 
 const getUploads = async (req, res, next) => {
   try {
-    // extract user id from req
-    const userId = req.user._id;
+    // extract username from req
+    const { username } = req.params;
 
-    // get user uploads
-    const uploads = await getUserUploads(userId);
+    let user;
 
-    // return user uploads as response
+    // if username is equal to logged in user's username, set user as logged in user
+    if (username === req.user.username) {
+      user = req.user;
+    }
+
+    // else find the user using username
+    else {
+      user = await findUserByUsername(username);
+    }
+
+    // if user does not exist, throw error
+    if (!user) {
+      throw new ApiError("Requested user not found", StatusCodes.NOT_FOUND);
+    }
+
+    // find the user's uploads
+    const uploads = await findUploads(user._id);
+
+    // return uploads as response
     return res.json(uploads);
   } catch (error) {
     // handle error

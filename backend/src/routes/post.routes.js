@@ -3,7 +3,7 @@ import authenticate from "../middlewares/authenticate.middleware.js";
 import validate from "../middlewares/validate.middleware.js";
 import postLikeRoutes from "./post-like.routes.js";
 import postCommentRoutes from "./post-comment.routes.js";
-import { getFeed, getUploads } from "../controllers/post.controllers.js";
+import { getFeed } from "../controllers/post.controllers.js";
 import { getMongoIdSchema } from "../schemas/mongoId.schema.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import {
@@ -31,8 +31,6 @@ router.use(
 router.post("/", upload.array("media"), createNewPost);
 
 router.get("/feed", getFeed);
-
-router.get("/uploads", getUploads);
 
 router.get("/:postId", validate(getMongoIdSchema("postId"), "params"), getPost);
 

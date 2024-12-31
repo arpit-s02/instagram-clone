@@ -4,6 +4,7 @@ import registerSchema from "../schemas/register.schema.js";
 import loginSchema from "../schemas/login.schema.js";
 import authenticate from "../middlewares/authenticate.middleware.js";
 import { getMongoIdSchema } from "../schemas/mongoId.schema.js";
+import { getUploads } from "../controllers/post.controllers.js";
 import {
   getFollowRequestDetails,
   sendFollowRequest,
@@ -24,7 +25,10 @@ router.post("/login", validate(loginSchema, "body"), signin);
 router.use(authenticate);
 
 router.get("/me", getAuthenticatedUserDetails);
+
 router.get("/:username", getUserDetails);
+
+router.get("/:username/uploads", getUploads);
 
 router.post(
   "/:followingId/follow",

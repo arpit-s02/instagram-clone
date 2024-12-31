@@ -17,7 +17,7 @@ const getPostById = async (postId) => {
   return post;
 };
 
-const getUserUploads = async (userId) => {
+const findUploads = async (userId) => {
   const uploads = await Post.find({ user: userId }, { __v: false }).sort({
     createdAt: -1,
   });
@@ -173,7 +173,7 @@ const decrementPostLikesCount = async (postId, session) => {
 export {
   handleCreatePost,
   getPostById,
-  getUserUploads,
+  findUploads,
   findFeedPosts,
   handleDeletePost,
   incrementCommentsCount,
