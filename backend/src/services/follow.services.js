@@ -126,8 +126,6 @@ const processFollowRequest = async (
         throw new Error("Invalid status");
     }
   } catch (error) {
-    console.error(error);
-
     throw new ApiError(
       "Failed to update follow request status",
       StatusCodes.INTERNAL_SERVER_ERROR
@@ -174,7 +172,6 @@ const removeFollowRequest = async (
     // if any error occurs, abort the transaction
     await session.abortTransaction();
 
-    console.error(error);
     throw new ApiError("Failed to delete follow request");
   } finally {
     // end the session

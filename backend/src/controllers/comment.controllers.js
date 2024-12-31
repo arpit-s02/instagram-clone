@@ -53,7 +53,6 @@ const getComments = async (req, res, next) => {
     return res.json(comments);
   } catch (error) {
     // handle error
-    console.error(error);
     next(error);
   }
 };
@@ -97,7 +96,6 @@ const createComment = async (req, res, next) => {
     return res.status(StatusCodes.CREATED).json(response);
   } catch (error) {
     // handle error
-    console.error(error);
     next(error);
   }
 };
@@ -151,7 +149,6 @@ const deleteComment = async (req, res, next) => {
     return res.status(StatusCodes.NO_CONTENT).send();
   } catch (error) {
     // handle error
-    console.error(error);
     next(error);
   }
 };
@@ -193,7 +190,6 @@ const createCommentLike = async (req, res, next) => {
     return res.status(StatusCodes.CREATED).json(response);
   } catch (error) {
     // handle error
-    console.error(error);
     next(error);
   }
 };
@@ -231,7 +227,6 @@ const deleteCommentLike = async (req, res, next) => {
     return res.json(response);
   } catch (error) {
     // handle error
-    console.error(error);
     next(error);
   }
 };

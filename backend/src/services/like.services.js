@@ -90,7 +90,6 @@ const handleCreateLike = async (userId, targetId, targetModel) => {
     //abort the transaction if any error occurs
     await session.abortTransaction();
 
-    console.error(error);
     throw new ApiError(
       "Failed to create like",
       StatusCodes.INTERNAL_SERVER_ERROR
@@ -145,7 +144,6 @@ const handleDeleteLike = async (likeId, targetId, targetModel) => {
     // if any error occurs, abort the transaction
     await session.abortTransaction();
 
-    console.error(error);
     throw new ApiError(
       "Failed to delete like",
       StatusCodes.INTERNAL_SERVER_ERROR

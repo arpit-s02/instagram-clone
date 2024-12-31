@@ -63,7 +63,6 @@ const handleCreatePost = async (postDetails) => {
     // if any error occurs, abort the transaction
     await session.abortTransaction();
 
-    console.error(error);
     throw new ApiError(
       "Failed to create post",
       StatusCodes.INTERNAL_SERVER_ERROR
@@ -107,7 +106,6 @@ const handleDeletePost = async (postId, userId) => {
     // if any error occurs, abort the transaction
     await session.abortTransaction();
 
-    console.error(error);
     throw new ApiError(
       "Failed to delete post",
       StatusCodes.INTERNAL_SERVER_ERROR

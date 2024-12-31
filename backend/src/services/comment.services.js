@@ -155,7 +155,6 @@ const removeComment = async (postId, commentId, parentId) => {
   } catch (error) {
     // if any error occurs, abort transaction
     await session.abortTransaction();
-    console.error(error);
     throw new ApiError(
       "Could not delete comment",
       StatusCodes.INTERNAL_SERVER_ERROR

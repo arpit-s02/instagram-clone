@@ -69,7 +69,6 @@ const createNewPost = async (req, res, next) => {
       .send({ message: "Post created successfully" });
   } catch (error) {
     // handle error
-    console.error(error);
     next(error);
   }
 };
@@ -103,7 +102,6 @@ const deletePost = async (req, res, next) => {
     return res.status(StatusCodes.NO_CONTENT).send();
   } catch (error) {
     // handle error
-    console.error(error);
     next(error);
   }
 };
@@ -132,7 +130,6 @@ const getFeed = async (req, res, next) => {
     return res.json(posts);
   } catch (error) {
     // handle error
-    console.error(error);
     next(error);
   }
 };
@@ -149,7 +146,6 @@ const getUploads = async (req, res, next) => {
     return res.json(uploads);
   } catch (error) {
     // handle error
-    console.error(error);
     next(error);
   }
 };
@@ -220,7 +216,6 @@ const createPostLike = async (req, res, next) => {
     return res.status(StatusCodes.CREATED).json(response);
   } catch (error) {
     // handle error
-    console.error(error);
     next(error);
   }
 };
@@ -255,7 +250,6 @@ const deletePostLike = async (req, res, next) => {
     return res.json(response);
   } catch (error) {
     // handle error
-    console.error(error);
     next(error);
   }
 };

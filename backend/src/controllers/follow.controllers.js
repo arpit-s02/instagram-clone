@@ -40,7 +40,6 @@ const getFollowRequestDetails = async (req, res, next) => {
     return res.json(response);
   } catch (error) {
     // handle error
-    console.error(error);
     next(error);
   }
 };
@@ -87,7 +86,6 @@ const sendFollowRequest = async (req, res, next) => {
       .send({ message: "Follow request sent successfully" });
   } catch (error) {
     // handle error
-    console.error(error);
     next(error);
   }
 };
@@ -138,7 +136,6 @@ const updateRequestStatus = async (req, res, next) => {
     return res.json(response);
   } catch (error) {
     // handle error
-    console.error(error);
     next(error);
   }
 };
@@ -179,7 +176,6 @@ const deleteFollowRequest = async (req, res, next) => {
     return res.status(StatusCodes.NO_CONTENT).send();
   } catch (error) {
     // handle error
-    console.error(error);
     next(error);
   }
 };

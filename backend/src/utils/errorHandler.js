@@ -1,8 +1,10 @@
 const errorHandler = (err, req, res, next) => {
-    const message = err.message || "Something went wrong";
-    const status = err.status || 500;
+  const status = err.status || 500;
+  const message = status === 500 ? "Something went wrong" : err.message;
 
-    return res.status(status).json({ message });
+  console.error(err);
+
+  return res.status(status).json({ message });
 };
 
 export default errorHandler;
