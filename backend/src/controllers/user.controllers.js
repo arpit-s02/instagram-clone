@@ -94,4 +94,29 @@ const getAuthenticatedUserDetails = (req, res, next) => {
   }
 };
 
-export { signup, signin, getAuthenticatedUserDetails };
+const getUserDetails = async (req, res, next) => {
+  try {
+    // extract username from req
+    const { username } = req.params;
+
+    // find user using username
+    const user = await findUserByUsername(username);
+
+    // if user does not exist, throw error
+    if (!user) {
+      throw new ApiError(
+        "Requested user does not exist",
+        StatusCodes.NOT_FOUND
+      );
+    }
+
+    // return user details as response
+    const { createdAt, updatedAt, __v, password, ...response } = user._doc;
+    return res.json(response);
+  } catch (error) {
+    // handle error
+    next(error);
+  }
+};
+
+export { signup, signin, getAuthenticatedUserDetails, getUserDetails };

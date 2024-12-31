@@ -10,6 +10,7 @@ import {
 } from "../controllers/follow.controllers.js";
 import {
   getAuthenticatedUserDetails,
+  getUserDetails,
   signin,
   signup,
 } from "../controllers/user.controllers.js";
@@ -23,6 +24,7 @@ router.post("/login", validate(loginSchema, "body"), signin);
 router.use(authenticate);
 
 router.get("/me", getAuthenticatedUserDetails);
+router.get("/:username", getUserDetails);
 
 router.post(
   "/:followingId/follow",
