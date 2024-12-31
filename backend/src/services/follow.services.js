@@ -22,6 +22,18 @@ const findUserFollowings = async (userId) => {
   return userFollowing;
 };
 
+const findUserFollowers = async (userId) => {
+  const userFollowers = await Follow.find(
+    {
+      following: userId,
+      status: followStatus.ACCEPTED,
+    },
+    { createdAt: false, updatedAt: false, __v: false }
+  ).populate("follower", "-password -createdAt -updatedAt -__v");
+
+  return userFollowers;
+};
+
 const findFollowRequest = async (followerId, followingId) => {
   const followRequest = await Follow.findOne({
     follower: followerId,
@@ -181,6 +193,7 @@ const removeFollowRequest = async (
 
 export {
   findUserFollowings,
+  findUserFollowers,
   createFollowRequest,
   findFollowRequest,
   findFollowRequestById,

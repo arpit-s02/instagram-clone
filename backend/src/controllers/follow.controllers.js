@@ -5,6 +5,7 @@ import {
   createFollowRequest,
   findFollowRequest,
   findFollowRequestById,
+  findUserFollowers,
   findUserFollowings,
   processFollowRequest,
   removeFollowRequest,
@@ -75,6 +76,42 @@ const getFollowings = async (req, res, next) => {
 
     // return user's followings as response
     return res.json(userFollowings);
+  } catch (error) {
+    // handle error
+    next(error);
+  }
+};
+
+const getFollowers = async (req, res, next) => {
+  try {
+    // extract username from req
+    const { username } = req.params;
+
+    let user;
+
+    // if username is equal to logged in user's username, set user as logged in user
+    if (username === req.user.username) {
+      user = req.user;
+    }
+
+    // else find user using username
+    else {
+      user = await findUserByUsername(username);
+    }
+
+    // if user does not exist, throw error
+    if (!user) {
+      throw new ApiError(
+        "Requested user does not exist",
+        StatusCodes.NOT_FOUND
+      );
+    }
+
+    // find user's followers
+    const userFollowers = await findUserFollowers(user._id);
+
+    // return user's followings as response
+    return res.json(userFollowers);
   } catch (error) {
     // handle error
     next(error);
@@ -222,5 +259,6 @@ export {
   updateRequestStatus,
   getFollowRequestDetails,
   getFollowings,
+  getFollowers,
   deleteFollowRequest,
 };
