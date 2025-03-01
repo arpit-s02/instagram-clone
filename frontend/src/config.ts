@@ -1,5 +1,5 @@
 const config = {
-    rootEndpoint: ""
-}
+  rootEndpoint: "http://localhost:8082/api/v1",
+};
 
 export default config;
